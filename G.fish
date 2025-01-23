@@ -1,5 +1,7 @@
 #!/usr/bin/fish
 
+# Kate Reed, 2024-12-07
+
 # This script uses the name it was invoked as to represent the instruction in
 # the block. Run something like:
 #   $ for n in (seq 0 99) 0(seq 0 9) 54.1 154 (seq 110 129) 90.1 91.1 92.(seq 1 3); ln -s G.fish G$n; end

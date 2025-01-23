@@ -19,6 +19,7 @@ enum ArgType {
   INTEGER = 3;
   FLOAT = 4;
   FILE_PATH = 5;
+  FLAG = 6;
 }
 
 enum Vendor {
@@ -34,18 +35,18 @@ message SingleArgument {
   ArgType type = 2;
   string description = 3;
   string value = 4;
-  bool mandatory = 5;
-  repeated Vendor flavors = 6;
+  repeated Vendor flavors = 5;
 }
 
-message MutexArg {
-  repeated Argument options = 1;
+message MutexArgument {
+  repeated SingleArgument choices = 1;
 }
 
 message Argument {
+  bool mandatory = 1;
   oneof argument {
-    SingleArgument solo = 1;
-    MutexArg arglist = 2;
+    SingleArgument solo = 2;
+    MutexArgument mutex = 3;
   }
 }
 
@@ -53,6 +54,9 @@ message Command {
   Letter letter = 1; // G, M, etc.
   string number = 2; // 0, 1, 59.3
   repeated Argument args = 3;
+  string description = 4;
+  string url = 5; // for online help
+  repeated Vendor flavors = 6;
 }
 message Comment {
   string comment = 1;

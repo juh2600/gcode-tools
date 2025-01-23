@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package qsp.gcode;
+
+import "google/protobuf/empty.proto";
+
+enum Letter {
+  UNSPECIFIED = 0;
+  G = 1;
+  M = 2;
+  T = 3;
+  D = 4;
+}
+
+enum ArgType {
+  ANY = 0;
+  NUMBER = 1;
+  STRING = 2;
+  INTEGER = 3;
+  FLOAT = 4;
+  FILE_PATH = 5;
+}
+
+enum Vendor {
+  COMMON = 0;
+  GRBL = 1;
+  FANUC = 2;
+  HAAS = 3;
+  MARLIN = 4;
+}
+
+message SingleArgument {
+  string name = 1;
+  ArgType type = 2;
+  string description = 3;
+  string value = 4;
+  bool mandatory = 5;
+  repeated Vendor flavors = 6;
+}
+
+message MutexArg {
+  repeated Argument options = 1;
+}
+
+message Argument {
+  oneof argument {
+    SingleArgument solo = 1;
+    MutexArg arglist = 2;
+  }
+}
+
+message Command {
+  Letter letter = 1; // G, M, etc.
+  string number = 2; // 0, 1, 59.3
+  repeated Argument args = 3;
+}
+message Comment {
+  string comment = 1;
+}
+message Line {
+  string raw = 1;
+}
+
+message Block {
+  oneof block {
+    Line raw = 1;
+    Command cmd = 2;
+    Comment cmt = 3;
+  }
+}
+
+message Program {
+  repeated Block blocks = 1;
+}
+
+
+service GcodeParser {
+  rpc toString(Block) returns (Line) {}
+  rpc parse(Line) returns (Block) {}
+}
+
+service CNCMachine {
+  rpc run(stream Block) returns (google.protobuf.Empty) {}
+  rpc run_one(Block) returns (google.protobuf.Empty) {}
+  rpc run_program(Program) returns (google.protobuf.Empty) {}
+}
+
+service GcodeDictionary {
+  rpc enumerate(google.protobuf.Empty) returns (stream Command) {}
+  rpc describe(Block) returns (Command) {}
+}
